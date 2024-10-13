@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RECUENTO JDTE</title>
+    <style>
+        body {
+            background-color: #87CEEB; /* Fondo azul celeste */
+            font-family: Arial, sans-serif;
+        }
+        .contenedor {
+            display: flex;
+            justify-content: space-between;
+        }
+        .columna {
+            width: 45%;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Reconocimiento de voz</h1>
+    <button id="activar-microfono">Activar micrófono</button>
+    <div class="contenedor">
+        <div class="columna">
+            <h2>Leucocitos</h2>
+            <ul id="leucocitos"></ul>
+            <p>Total: <span id="total-leucocitos">0</span></p>
+        </div>
+        <div class="columna">
+            <h2>Parásitos</h2>
+            <ul id="parasitos"></ul>
+            <p>Total: <span id="total-parasitos">0</span></p>
+        </div>
+    </div>
+    <script>
+        const activarMicrofono = document.getElementById('activar-microfono');
+        const leucocitos = document.getElementById('leucocitos');
+        const parasitos = document.getElementById('parasitos');
+        const totalLeucocitos = document.getElementById('total-leucocitos');
+        const totalParasitos = document.getElementById('total-parasitos');
+
+        let sumaLeucocitos = 0;
+        let sumaParasitos = 0;
+
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'es-ES';
+
+        activarMicrofono.addEventListener('click', () => {
+            recognition.start();
+        });
+
+        recognition.onresult = (event) => {
+            const texto = event.results[0][0].transcript.toLowerCase();
+            const palabras = texto.split(' ');
+            const numero = parseInt(palabras[1]);
+            if (numero >= 1 && numero <= 500) {
+                if (palabras[0] === 'leucocitos') {
+                    agregarElemento(leucocitos, numero);
+                    sumaLeucocitos += numero;
+                    totalLeucocitos.textContent = sumaLeucocitos;
+                } else if (palabras[0] === 'parásitos') {
+                    agregarElemento(parasitos, numero);
+                    sumaParasitos += numero;
+                    totalParasitos.textContent = sumaParasitos;
+                }
+            }
+        };
+
+        function agregarElemento(lista, numero) {
+            const li = document.createElement('li');
+            li.textContent = numero;
+            lista.appendChild(li);
+        }
+
+        recognition.onerror = (event) => {
+            console.error('Error en el reconocimiento de voz:', event.error);
+        };
+    </script>
+</body>
+</html>
